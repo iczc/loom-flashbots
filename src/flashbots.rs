@@ -3,7 +3,7 @@ use crate::client::{
     FlashbotsMiddlewareError, RelayConfig, SendBundleResponseType, SimulatedBundle,
 };
 use alloy_network::Ethereum;
-use alloy_primitives::{TxHash, U64};
+use alloy_primitives::{Address, TxHash, U64};
 use alloy_provider::Provider;
 use alloy_signer_local::PrivateKeySigner;
 use alloy_transport::Transport;
@@ -149,33 +149,34 @@ where
     pub fn with_default_relays(self) -> Self {
         let provider = self.provider.clone();
 
-        let flashbots = FlashbotsClient::new(provider.clone(), "https://relay.flashbots.net");
+        let _flashbots = FlashbotsClient::new(provider.clone(), "https://relay.flashbots.net");
         let beaverbuild = FlashbotsClient::new(provider.clone(), "https://rpc.beaverbuild.org/");
         let titan = FlashbotsClient::new(provider.clone(), "https://rpc.titanbuilder.xyz");
         let rsync = FlashbotsClient::new(provider.clone(), "https://rsync-builder.xyz");
         //let builder0x69 = FlashbotsClient::new_no_sign(provider.clone(), "https://builder0x69.io");
-        let eden = FlashbotsClient::new(provider.clone(), "https://api.edennetwork.io/v1/bundle");
-        let eth_builder = FlashbotsClient::new_no_sign(provider.clone(), "https://eth-builder.com");
-        let secureapi =
+        let _eden = FlashbotsClient::new(provider.clone(), "https://api.edennetwork.io/v1/bundle");
+        let _eth_builder =
+            FlashbotsClient::new_no_sign(provider.clone(), "https://eth-builder.com");
+        let _secureapi =
             FlashbotsClient::new_no_sign(provider.clone(), "https://api.securerpc.com/v1");
         //let blocknative = FlashbotsClient::new(provider.clone(), "https://api.blocknative.com/v1/auction");
         let buildai = FlashbotsClient::new_no_sign(provider.clone(), "https://BuildAI.net");
         let payloadde = FlashbotsClient::new_no_sign(provider.clone(), "https://rpc.payload.de");
-        let fibio = FlashbotsClient::new(provider.clone(), "https://rpc.f1b.io");
+        let _fibio = FlashbotsClient::new(provider.clone(), "https://rpc.f1b.io");
         let loki = FlashbotsClient::new(provider.clone(), "https://rpc.lokibuilder.xyz");
         let ibuilder = FlashbotsClient::new(provider.clone(), "https://rpc.ibuilder.xyz");
         let jetbuilder = FlashbotsClient::new(provider.clone(), "https://rpc.jetbldr.xyz");
         let penguinbuilder = FlashbotsClient::new(provider.clone(), "https://rpc.penguinbuild.org");
-        let gambitbuilder = FlashbotsClient::new(provider.clone(), "https://builder.gmbit.co/rpc");
+        let _gambitbuilder = FlashbotsClient::new(provider.clone(), "https://builder.gmbit.co/rpc");
 
         let clients_vec = vec![
-            flashbots,
+            // flashbots,
             /* builder0x69,*/ titan,
-            fibio,
-            eden,
-            eth_builder,
+            // fibio,
+            // eden,
+            // eth_builder,
             beaverbuild,
-            secureapi,
+            // secureapi,
             rsync,
             /*blocknative,*/ buildai,
             payloadde,
@@ -183,7 +184,7 @@ where
             ibuilder,
             jetbuilder,
             penguinbuilder,
-            gambitbuilder,
+            // gambitbuilder,
         ];
 
         let clients = clients_vec.into_iter().map(Arc::new).collect();
@@ -248,6 +249,34 @@ where
             bundle = bundle.push_transaction(t);
         }
 
+        self.broadcast_bundle(bundle).await
+    }
+
+    pub async fn broadcast_txes_with_refund<TX>(
+        &self,
+        txs: Vec<TX>,
+        block: u64,
+        refund_recipient: Address,
+        refund_percent: u64,
+        refund_tx_hashes: Option<Vec<TxHash>>,
+    ) -> Result<()>
+    where
+        BundleTransaction: From<TX>,
+    {
+        let mut bundle = BundleRequest::new()
+            .set_refund_recipient(refund_recipient)
+            .set_refund_tx_hashes(refund_tx_hashes)
+            .set_refund_percent(refund_percent)
+            .set_block(U64::from(block));
+
+        for t in txs.into_iter() {
+            bundle = bundle.push_transaction(t);
+        }
+
+        self.broadcast_bundle(bundle).await
+    }
+
+    pub async fn broadcast_bundle(&self, bundle: BundleRequest) -> Result<()> {
         let next_req_id = self.req_id.load(Ordering::SeqCst) + 1;
         self.req_id.store(next_req_id, Ordering::SeqCst);
 

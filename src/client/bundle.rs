@@ -86,6 +86,18 @@ pub struct BundleRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "baseFee")]
     simulation_basefee: Option<u64>,
+
+    #[serde(rename = "refundPercent")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refund_percent: Option<u64>,
+
+    #[serde(rename = "refundTxHashes")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refund_tx_hashes: Option<Vec<TxHash>>,
+
+    #[serde(rename = "refundRecipient")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refund_recipient: Option<Address>,
 }
 
 pub fn serialize_txs<S>(txs: &[BundleTransaction], s: S) -> Result<S::Ok, S::Error>
@@ -277,6 +289,29 @@ impl BundleRequest {
     /// in seconds since the UNIX epoch.
     pub fn set_max_timestamp(mut self, timestamp: u64) -> Self {
         self.max_timestamp = Some(timestamp);
+        self
+    }
+
+    pub fn refund_percent(&self) -> Option<u64> {
+        self.refund_percent
+    }
+
+    pub fn set_refund_percent(mut self, refund_percent: u64) -> Self {
+        self.refund_percent = Some(refund_percent);
+        self
+    }
+
+    pub fn set_refund_tx_hashes(mut self, refund_tx_hashes: Option<Vec<TxHash>>) -> Self {
+        self.refund_tx_hashes = refund_tx_hashes;
+        self
+    }
+
+    pub fn refund_recipient(&self) -> Option<Address> {
+        self.refund_recipient
+    }
+
+    pub fn set_refund_recipient(mut self, refund_recipient: Address) -> Self {
+        self.refund_recipient = Some(refund_recipient);
         self
     }
 }
