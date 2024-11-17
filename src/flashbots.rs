@@ -160,13 +160,14 @@ where
         let _secureapi =
             FlashbotsClient::new_no_sign(provider.clone(), "https://api.securerpc.com/v1");
         //let blocknative = FlashbotsClient::new(provider.clone(), "https://api.blocknative.com/v1/auction");
-        let buildai = FlashbotsClient::new_no_sign(provider.clone(), "https://BuildAI.net");
-        let payloadde = FlashbotsClient::new_no_sign(provider.clone(), "https://rpc.payload.de");
+        let _buildai = FlashbotsClient::new_no_sign(provider.clone(), "https://BuildAI.net");
+        let _payloadde = FlashbotsClient::new_no_sign(provider.clone(), "https://rpc.payload.de");
         let _fibio = FlashbotsClient::new(provider.clone(), "https://rpc.f1b.io");
         let loki = FlashbotsClient::new(provider.clone(), "https://rpc.lokibuilder.xyz");
-        let ibuilder = FlashbotsClient::new(provider.clone(), "https://rpc.ibuilder.xyz");
-        let jetbuilder = FlashbotsClient::new(provider.clone(), "https://rpc.jetbldr.xyz");
-        let penguinbuilder = FlashbotsClient::new(provider.clone(), "https://rpc.penguinbuild.org");
+        let _ibuilder = FlashbotsClient::new(provider.clone(), "https://rpc.ibuilder.xyz");
+        let _jetbuilder = FlashbotsClient::new(provider.clone(), "https://rpc.jetbldr.xyz");
+        let _penguinbuilder =
+            FlashbotsClient::new(provider.clone(), "https://rpc.penguinbuild.org");
         let _gambitbuilder = FlashbotsClient::new(provider.clone(), "https://builder.gmbit.co/rpc");
 
         let clients_vec = vec![
@@ -178,12 +179,12 @@ where
             beaverbuild,
             // secureapi,
             rsync,
-            /*blocknative,*/ buildai,
-            payloadde,
+            /*blocknative, buildai,*/
+            // payloadde,
             loki,
-            ibuilder,
-            jetbuilder,
-            penguinbuilder,
+            // ibuilder,
+            // jetbuilder,
+            // penguinbuilder,
             // gambitbuilder,
         ];
 
